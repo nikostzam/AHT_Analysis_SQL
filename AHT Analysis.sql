@@ -18,7 +18,7 @@ CREATE TABLE Fact_AHT (
 )
 
 BULK INSERT Fact_AHT
-FROM 'C:\Users\nikostzam\Desktop\SQL\SQL AHT\AHT_data.csv'
+FROM 'C:\Users\******\Desktop\SQL\SQL AHT\AHT_data.csv'
 WITH (
 	FIRSTROW =2,
 	FIELDTERMINATOR = ',',
@@ -36,7 +36,7 @@ ADD CONSTRAINT PK_Fact_AHT PRIMARY KEY (ID_Key);
 
 SELECT * FROM Fact_AHT
 
---CALCULATE DYNAMIC AHT GOAL BASED ON MEDIAN VALUE OF EACH SKILL ID
+--Calculate dynamic AHT goal based on skill ID
 SELECT SkillID,
 	   Employee,
 	   SUM(TotalHandlingTime)/SUM(Calls) as AHT,
@@ -45,7 +45,7 @@ FROM Fact_AHT
 GROUP BY Employee, SkillID, Calls
 ORDER BY SkillID, AHT, Employee;
 
---CHECK EACH AGENTS PERFORMANCE BASED ON DYNAMIC GOAL
+--Check each agents performance based on dynamic goal
 WITH aht_target AS (
 	SELECT SkillID,
 	   Employee,
@@ -71,6 +71,9 @@ WITH BaseData AS (
             SUM(TotalHandlingTime) OVER (PARTITION BY MonthName, Employee) AS AHT_Attainment_Month
     FROM Fact_AHT
 ),
+
+--Outlier management, remove 0.25 and 0.75 percentiles
+
 IQRCalc AS (
     SELECT 
         *,
@@ -80,6 +83,9 @@ IQRCalc AS (
             OVER (PARTITION BY MonthName) AS Q3
     FROM BaseData
 ),
+
+--Filter data based on IQRs
+
 FilteredData AS(
 	SELECT *,
 		   (Q3-Q1) AS IQR,
@@ -92,6 +98,9 @@ OutlierFilteredData AS(
 	FROM FilteredData
 	WHERE AHTATT BETWEEN LowerBound AND UpperBound
 ), 
+
+--Calculate Six Sigma stats
+	
 StatCalc AS(
 SELECT DISTINCT MonthName,
 	   DATEADD(MONTH, 1 , DateFrom) AS DateFrom,
@@ -109,6 +118,9 @@ SELECT DISTINCT MonthName,
 		end as USS
 FROM OutlierFilteredData
 ),
+
+--Create new targets and join with the main StatsCalc CTE
+
 new_target AS (
     SELECT DISTINCT 
         b.[MonthName] AS [ResultMonth],
@@ -164,4 +176,5 @@ Select [Date]
  ,[NewTarget]
  ,[Target Reduction]
  From Fact_AHT as c
+
  left join new_target as n on n.Employee = c.Employee and c.[Date] between n.DateFrom and n.DateTo;
