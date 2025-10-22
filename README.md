@@ -10,5 +10,22 @@ The goal is to:
 - Compute performance statistics per month (Mean, Std Dev, Limits).
 - Suggest **new dynamic AHT targets** for agents based on their performance level.
 
+📈 Final Output
 
+The final query produces a dataset containing:
+
+Date
+Employee
+Skill ID
+Calls
+AHT & Goals
+Performance Rank
+Suggested new target
+Target reduction percentage
+
+🧩 Tech Stack
+SQL Server (T-SQL)
+CSV data ingestion
+Window & analytic functions
+Statistical modeling within SQL
 
