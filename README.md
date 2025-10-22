@@ -70,6 +70,7 @@ To improve accuracy, statistical **outliers** are removed using the **Interquart
 (Q3 + 1.5 * IQR) AS UpperBound,
 (Q1 - 1.5 * IQR) AS LowerBound
 
+---
 
 ## 🧠 Step 5: Statistical Control & Six Sigma Logic
 
@@ -77,6 +78,8 @@ For the filtered data, monthly mean and standard deviation are calculated:
 
 AVG(AHTATT) AS MeanATT,
 STDEV(AHTATT) AS StdDevATT
+
+---
 
 ## 🧩 Step 6: Dynamic Target Recalibration
 
@@ -102,18 +105,6 @@ END
 🏆 Step 7: Final Output
 
 The final result provides a ranked performance view per month:
-
-Column	Description
-Date	Transaction date
-Employee	Agent name
-SkillID	Skill or LOB
-Calls	Total handled interactions
-AHT	Actual Average Handling Time
-AHTGoal	Original target
-NewTarget	Recalculated optimized target
-Target Reduction	Percentage difference from baseline
-Reverse_PerformanceRank	Rank based on AHT attainment
-
 This dataset enables supervisors and analysts to track continuous improvement across skills and individuals.
 
 🧰 Technologies Used
